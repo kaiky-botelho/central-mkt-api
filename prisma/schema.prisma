@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id           String       @id @default(uuid())
+  nome         String
+  email        String       @unique
+  senha        String
+  perfil       Perfil       @default(MEMBRO)
+  publicacoes  Publicacao[] @relation("UsuarioPublicacoes")
+  criadoEm     DateTime     @default(now())
+  atualizadoEm DateTime     @updatedAt
+}
+
+model Publicacao {
+  id               String           @id @default(uuid())
+  titulo           String
+  canal            String
+  formato          String
+  dataPlanejada    DateTime
+  dataPublicacao   DateTime?
+  status           StatusPublicacao @default(RASCUNHO)
+  legenda          String?          @db.Text
+  urlImagem        String?
+  linkPublicacao   String?
+  naoPlanejado     Boolean          @default(false)
+  autorId          String
+  autor            Usuario          @relation("UsuarioPublicacoes", fields: [autorId], references: [id])
+  criadoEm         DateTime         @default(now())
+  atualizadoEm     DateTime         @updatedAt
+
+  @@index([dataPlanejada])
+  @@index([status])
+}
+
+enum Perfil {
+  ADMIN
+  MEMBRO
+}
+
+enum StatusPublicacao {
+  RASCUNHO
+  AGUARDANDO
+  EM_PRODUCAO
+  PUBLICADO_NO_PRAZO
+  PUBLICADO_COM_ATRASO
+  NAO_PUBLICADO
+}
