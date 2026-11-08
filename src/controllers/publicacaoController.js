@@ -1,22 +1,16 @@
 const prisma = require('../prisma');
 
 module.exports = {
-    // Buscar posts (com suporte a filtro por mês/ano)
     async listar(req, res) {
         try {
             const { mes, ano } = req.query;
             let filtro = {};
 
-            // Se o front enviar ?mes=08&ano=2026, filtramos apenas os posts daquele mês
             if (mes && ano) {
                 const dataInicio = new Date(ano, mes - 1, 1);
                 const dataFim = new Date(ano, mes, 0, 23, 59, 59);
-
                 filtro = {
-                    dataPlanejada: {
-                        gte: dataInicio,
-                        lte: dataFim
-                    }
+                    dataPlanejada: { gte: dataInicio, lte: dataFim }
                 };
             }
 
@@ -34,7 +28,8 @@ module.exports = {
 
     async criar(req, res) {
         try {
-            const { titulo, canal, formato, dataPlanejada, legenda, autorID } = req.body;
+            // Tudo com "Id" minúsculo no final
+            const { titulo, canal, formato, dataPlanejada, legenda, autorId } = req.body;
 
             const novaPublicacao = await prisma.publicacao.create({
                 data: {
@@ -43,10 +38,11 @@ module.exports = {
                     formato,
                     dataPlanejada: new Date(dataPlanejada),
                     legenda,
-                    autorID,
-                    status: "AGUARDANDO"
+                    autorId, // Tudo com "Id" minúsculo no final
+                    status: 'AGUARDANDO'
                 }
             });
+
             res.status(201).json(novaPublicacao);
         } catch (erro) {
             console.error(erro);
