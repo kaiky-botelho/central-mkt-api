@@ -52,6 +52,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.get('/api/status', (req, res) => {
     res.json({ status: 'Central MKT API rodando perfeitamente!' });
 });
+app.get('/', (req, res) => {
+    res.redirect('/api-docs');
+});
 
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/publicacoes', require('./routes/publicacoes.routes'));
